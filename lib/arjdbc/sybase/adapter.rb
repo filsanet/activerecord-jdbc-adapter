@@ -1,3 +1,6 @@
+#~/.rvm/gems/jruby-1.6.5/gems/activerecord-jdbc-adapter-1.2.1/lib/arjdbc/sybase/adapter.rb
+require 'arjdbc/mssql/adapter'
+
 module ArJdbc
   module Sybase
     def add_limit_offset!(sql, options) # :nodoc:
@@ -41,6 +44,15 @@ module ArJdbc
 
     def remove_index(table_name, options = {})
       execute "DROP INDEX #{table_name}.#{index_name(table_name, options)}"
+    end
+
+    def self.column_selector
+      [/sybase/i, lambda {|cfg,col| col.extend(::ArJdbc::MsSQL::Column)}]
+    end
+
+    def self.arel2_visitors(config)
+      require 'arel/visitors/sybase'
+      {"sybase" => ::Arel::Visitors::Sybase }
     end
   end
 end
